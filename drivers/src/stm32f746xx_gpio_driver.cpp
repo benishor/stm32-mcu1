@@ -79,9 +79,9 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle) {
 	pGPIOHandle->pGPIOx->PUPDR |= pGPIOHandle->pinConfig.pinPuPdControl
 			<< pinTwoBitShift;
 
-	// 4. configure the OPTYPE
+	// 4. configure the OTYPE
 	pGPIOHandle->pGPIOx->OTYPER &= pinOneBitMask;
-	pGPIOHandle->pGPIOx->OTYPER |= pGPIOHandle->pinConfig.pinOPType
+	pGPIOHandle->pGPIOx->OTYPER |= pGPIOHandle->pinConfig.pinOType
 			<< pinOneBitShift;
 
 	// 5. configure the alternate functionality
@@ -154,4 +154,92 @@ void GPIO_IRQConfig(void) {
 }
 
 void GPIO_IRQHandling(void) {
+}
+
+GPIO_RegDef_t* fromPort(Port port) {
+	switch (port) {
+	case Port::A:
+		return GPIOA;
+	case Port::B:
+		return GPIOB;
+	case Port::C:
+		return GPIOC;
+	case Port::D:
+		return GPIOD;
+	case Port::E:
+		return GPIOE;
+	case Port::F:
+		return GPIOF;
+	case Port::G:
+		return GPIOG;
+	case Port::H:
+		return GPIOH;
+	case Port::I:
+		return GPIOI;
+	case Port::J:
+		return GPIOJ;
+	case Port::K:
+		return GPIOK;
+	default:
+		return GPIOA;
+	}
+}
+
+uint8_t toPinPullUp(PinPullUpMode mode) {
+	switch (mode) {
+	case PinPullUpMode::PullUp:
+		return PullUp;
+	case PinPullUpMode::PullDown:
+		return PullDown;
+	default:
+		return NoPullUpNoPullDown;
+	}
+}
+
+uint8_t toPinNumber(PinNumber pin) {
+	switch (pin) {
+	case PinNumber::Pin0:
+		return Pin0;
+	case PinNumber::Pin1:
+		return Pin1;
+	case PinNumber::Pin2:
+		return Pin2;
+	case PinNumber::Pin3:
+		return Pin3;
+	case PinNumber::Pin4:
+		return Pin4;
+	case PinNumber::Pin5:
+		return Pin5;
+	case PinNumber::Pin6:
+		return Pin6;
+	case PinNumber::Pin7:
+		return Pin7;
+	case PinNumber::Pin8:
+		return Pin8;
+	case PinNumber::Pin9:
+		return Pin9;
+	case PinNumber::Pin10:
+		return Pin10;
+	case PinNumber::Pin11:
+		return Pin11;
+	case PinNumber::Pin12:
+		return Pin12;
+	case PinNumber::Pin13:
+		return Pin13;
+	case PinNumber::Pin14:
+		return Pin14;
+	default:
+		return Pin15;
+	}
+}
+
+uint8_t toOutputType(PinOutputType outputType) {
+	switch (outputType) {
+	case PinOutputType::PushPull:
+		return PushPull;
+	case PinOutputType::OpenDrain:
+		return OpenDrain;
+	default:
+		return 0; // should never happen
+	}
 }

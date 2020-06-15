@@ -3,15 +3,55 @@
 
 #include "stm32f746xx.h"
 
-enum EnabledOrDisabled {
+
+enum class Port {
+	A, B, C, D, E, F, G, H, I, J, K
+};
+
+enum class PinPullUpMode {
+	None, PullUp, PullDown
+};
+
+enum class PinOutputType {
+	PushPull,
+	OpenDrain
+};
+
+enum class PinNumber {
+	Pin0,
+	Pin1,
+	Pin2,
+	Pin3,
+	Pin4,
+	Pin5,
+	Pin6,
+	Pin7,
+	Pin8,
+	Pin9,
+	Pin10,
+	Pin11,
+	Pin12,
+	Pin13,
+	Pin14,
+	Pin15,
+	Pin16
+};
+
+
+GPIO_RegDef_t* fromPort(Port port);
+uint8_t toPinPullUp(PinPullUpMode mode);
+uint8_t toPinNumber(PinNumber pin);
+uint8_t toOutputType(PinOutputType outputType);
+
+enum EnabledOrDisabledEnum {
 	Disabled = 0, Enabled = 1
 };
 
-enum PinState {
+enum PinStateEnum {
 	Set = Enabled, Reset = Disabled
 };
 
-enum PortNumber {
+enum PortNumberEnum {
 	GpioA = 0,
 	GpioB = 1,
 	GpioC = 2,
@@ -25,7 +65,7 @@ enum PortNumber {
 	GpioK = 10,
 };
 
-enum PinNumber {
+enum PinNumberEnum {
 	Pin0 = 0,
 	Pin1,
 	Pin2,
@@ -44,7 +84,7 @@ enum PinNumber {
 	Pin15
 };
 
-enum PinMode {
+enum PinModeEnum {
 	Input = 0,
 	Output = 1,
 	AlternateFunction = 2,
@@ -55,15 +95,15 @@ enum PinMode {
 
 };
 
-enum PinSpeed {
+enum PinSpeedEnum {
 	Low = 0, Medium = 1, High = 2, VeryHigh = 3
 };
 
-enum PullUpPullDownControl {
+enum PullUpPullDownControlEnum {
 	NoPullUpNoPullDown = 0, PullUp = 1, PullDown = 2
 };
 
-enum PinOutputType {
+enum PinOutputTypeEnum {
 	PushPull = 0, OpenDrain = 1
 };
 
@@ -72,7 +112,7 @@ typedef struct {
 	uint8_t pinMode;
 	uint8_t pinSpeed;
 	uint8_t pinPuPdControl;
-	uint8_t pinOPType;
+	uint8_t pinOType;
 	uint8_t pinAltFunMode;
 
 } GPIO_PinConfig_t;
