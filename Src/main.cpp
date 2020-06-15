@@ -1,5 +1,6 @@
 #include "stm32f746xx.h"
 #include "stm32f746_gpio_driver.h"
+#include "DigitalIn.h"
 
 //#if !defined(__SOFT_FP__) && defined(__ARM_FP)
 //  #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
@@ -23,18 +24,10 @@ int main(void) {
 
 	GPIO_Init(&ledHandle);
 
-	GPIO_Handle_t btnHandle;
-	btnHandle.pGPIOx = GPIOI;
-	btnHandle.pinConfig.pinNumber = Pin11;
-	btnHandle.pinConfig.pinMode = Input;
-	btnHandle.pinConfig.pinSpeed = High;
-	btnHandle.pinConfig.pinPuPdControl = NoPullUpNoPullDown;
-
-	GPIO_Init(&btnHandle);
+	DigitalIn button(Port::I, PinNumberEnum::Pin11, PinPullUpMode::None);
 
 	while (1) {
-		if (GPIO_ReadFromInputPin(btnHandle.pGPIOx,
-				btnHandle.pinConfig.pinNumber) == Enabled) {
+		if (button.read()) {
 			delay();
 			GPIO_ToggleOutputPin(ledHandle.pGPIOx,
 					ledHandle.pinConfig.pinNumber);

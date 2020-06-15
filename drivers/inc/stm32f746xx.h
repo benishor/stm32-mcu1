@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 #define FLASH_BASEADDR 			0x08000000U
 #define SRAM1_BASEADDR 			0x20010000U
