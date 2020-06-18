@@ -6,12 +6,11 @@ void delay() {
 	}
 }
 
-extern "C" {
 // need to enable FPU access, otherwise FP operations will fail
 #define CPACR (uint32_t *)0xE000ED88
-void SystemInit() {
+
+extern "C" void SystemInit() {
 	*CPACR |= ((3UL << 20) | (3UL << 22)); // set CP10 and CP11 to full access
-}
 }
 
 GPIO_Handle_t led, btn;
@@ -62,11 +61,9 @@ int main(void) {
 //	}
 }
 
-extern "C" {
-void EXTI15_10_IRQHandler(void) {
+extern "C" void EXTI15_10_IRQHandler(void) {
 	// handle the interrupt
 	GPIO_IRQHandling(btn.pinConfig.pinNumber);
 
 	GPIO_ToggleOutputPin(led.pGPIOx, led.pinConfig.pinNumber);
-}
 }
