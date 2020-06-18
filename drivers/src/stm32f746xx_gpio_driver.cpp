@@ -66,6 +66,30 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle) {
 		pGPIOHandle->pGPIOx->MODER |= pGPIOHandle->pinConfig.pinMode << pinTwoBitShift;
 	} else {
 		// TODO: implement IT modes
+		if (pGPIOHandle->pinConfig.pinMode == InterruptFallingEdge) {
+			// configure the FTSR
+			EXTI->FTSR |= (1 << pGPIOHandle->pinConfig.pinNumber);
+			EXTI->RTSR &= ~(1 << pGPIOHandle->pinConfig.pinNumber);
+		} else if (pGPIOHandle->pinConfig.pinMode == InterruptRisingEdge) {
+			// configure the RTSR
+			EXTI->FTSR &= ~(1 << pGPIOHandle->pinConfig.pinNumber);
+			EXTI->RTSR |= (1 << pGPIOHandle->pinConfig.pinNumber);
+		} else {
+			// configure both FTSR and RTSR
+			EXTI->FTSR |= (1 << pGPIOHandle->pinConfig.pinNumber);
+			EXTI->RTSR |= (1 << pGPIOHandle->pinConfig.pinNumber);
+		}
+
+		// 2. configure the GPIO port selection in SYSCFG_EXTICR
+		uint8_t exticr_index = pGPIOHandle->pinConfig.pinNumber >> 2;
+		uint8_t port_index = portToIndex(pGPIOHandle->pGPIOx);
+
+		SYSCFG_PCLK_EN();
+		uint32_t value = port_index << (4 * (pGPIOHandle->pinConfig.pinNumber & 3));
+		SYSCFG->EXTICR[exticr_index] = value;
+
+		// 3. enable the EXTI interrupt delivery using IMR (interrupt mask register)
+		EXTI->IMR |= (1 << pGPIOHandle->pinConfig.pinNumber);
 	}
 
 	// 2. configure the output speed
@@ -143,10 +167,12 @@ void GPIO_ToggleOutputPin(GPIO_RegDef_t *pGPIOx, uint8_t pinNumber) {
 	pGPIOx->ODR ^= 1 << pinNumber;
 }
 
-void GPIO_IRQConfig(void) {
-}
-
-void GPIO_IRQHandling(void) {
+void GPIO_IRQHandling(uint8_t pinNumber) {
+	// clear the EXTI PR register corresponding to the pin number
+	if (EXTI->PR & (1 << pinNumber)) {
+		// clear
+		EXTI->PR |= (1 << pinNumber);
+	}
 }
 
 GPIO_RegDef_t* fromPort(Port port) {
@@ -235,4 +261,46 @@ uint8_t toOutputType(PinOutputType outputType) {
 	default:
 		return 0; // should never happen
 	}
+}
+
+uint8_t portToIndex(GPIO_RegDef_t *port) {
+	if (port == GPIOA)
+		return 0;
+	if (port == GPIOB)
+		return 1;
+	if (port == GPIOC)
+		return 2;
+	if (port == GPIOD)
+		return 3;
+	if (port == GPIOE)
+		return 4;
+	if (port == GPIOF)
+		return 5;
+	if (port == GPIOG)
+		return 6;
+	if (port == GPIOH)
+		return 7;
+	if (port == GPIOI)
+		return 8;
+	if (port == GPIOJ)
+		return 9;
+	if (port == GPIOK)
+		return 10;
+
+	return 0;
+}
+
+void GPIO_IRQInterruptConfig(uint8_t irqNumber, uint8_t enabled) {
+	if (enabled) {
+		NVIC_ISER[irqNumber / 32] |= 1 << (irqNumber & 31);
+	} else {
+		NVIC_ICER[irqNumber / 32] |= 1 << (irqNumber & 31);
+	}
+}
+
+void GPIO_IRQPriorityConfig(uint8_t irqNumber, uint8_t irqPriority) {
+	NVIC_IPR[irqNumber / 4] &= ~(0xff << (8 * (irqNumber & 3)));
+	// only priorities 0-15 are implemented and they are stored in the upper nibble of each NVIC_IPR priority slot
+	uint8_t shiftAmount = (8 * irqNumber & 3) + (8 - NO_PR_BITS_IMPLEMENTED);
+	NVIC_IPR[irqNumber / 4] |= ((irqPriority & 0xf) << shiftAmount);
 }

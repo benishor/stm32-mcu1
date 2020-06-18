@@ -2,6 +2,15 @@
 
 #include <cstdint>
 
+#define NVIC_ISER_BASEADDR		0xE000E100
+#define NVIC_ICER_BASEADDR		0xE000E180
+#define NVIC_ISPR_BASEADDR		0xE000E200
+#define NVIC_ICPR_BASEADDR		0xE000E280
+#define NVIC_IABR_BASEADDR		0xE000E300
+#define NVIC_IPR_BASEADDR		0xE000E400
+#define NVIC_STIR_BASEADDR		0xE000EF00
+#define NO_PR_BITS_IMPLEMENTED	4 // only upper nibble is used for priorities values
+
 #define FLASH_BASEADDR 			0x08000000U
 #define SRAM1_BASEADDR 			0x20010000U
 #define SRAM2_BASEADDR 			0x2004C000U
@@ -121,6 +130,23 @@ typedef struct {
 	volatile uint32_t DCKCFGR2;
 } RCC_RegDef_t;
 
+typedef struct {
+	volatile uint32_t IMR; 		// offset 0x00, interrupt mask register
+	volatile uint32_t EMR; 		// offset 0x04, event mask register
+	volatile uint32_t RTSR; 	// offset 0x08, rising trigger selection register
+	volatile uint32_t FTSR;		// offset 0x0C, falling trigger selection register
+	volatile uint32_t SWIER;	// offset 0x10, software interrupt event register
+	volatile uint32_t PR;		// offset 0x14, pending register
+} EXTI_RegDef_t;
+
+typedef struct {
+	volatile uint32_t MEMRMP; 		// offset 0x00, memory remap register
+	volatile uint32_t PMC; 			// offset 0x04, peripheral mode configuration register
+	volatile uint32_t EXTICR[4]; // offset 0x08, external interrupt configuration registers. EXTICR[0] -> pins 0 to 3, EXTICR[1] -> pins 4 to 7, etc...
+	volatile uint32_t _reserved_0;	// reserved
+	volatile uint32_t CMPCR; 		// offset 0x20, compensation cell control register
+} SYSCFG_RegDef_t;
+
 // Peripheral definitions (Peripheral base addresses casted to GPIO_RegDef_t)
 #define GPIOA 		((GPIO_RegDef_t*)GPIOA_BASEADDR)
 #define GPIOB 		((GPIO_RegDef_t*)GPIOB_BASEADDR)
@@ -134,6 +160,16 @@ typedef struct {
 #define GPIOJ 		((GPIO_RegDef_t*)GPIOJ_BASEADDR)
 #define GPIOK 		((GPIO_RegDef_t*)GPIOK_BASEADDR)
 #define RCC   		((RCC_RegDef_t*)RCC_BASEADDR)
+#define EXTI   		((EXTI_RegDef_t*)EXTI_BASEADDR)
+#define SYSCFG   	((SYSCFG_RegDef_t*)SYSCFG_BASEADDR)
+
+#define NVIC_ISER				((volatile uint32_t*)NVIC_ISER_BASEADDR)
+#define NVIC_ICER				((volatile uint32_t*)NVIC_ICER_BASEADDR)
+#define NVIC_ISPR				((volatile uint32_t*)NVIC_ISPR_BASEADDR)
+#define NVIC_ICPR				((volatile uint32_t*)NVIC_ICPR_BASEADDR)
+#define NVIC_IABR				((volatile uint32_t*)NVIC_IABR_BASEADDR)
+#define NVIC_IPR				((volatile uint32_t*)NVIC_IPR_BASEADDR)
+#define NVIC_STIR				((volatile uint32_t*)NVIC_STIR_BASEADDR)
 
 // Clock enable macros for GPIOx peripherals
 #define GPIOA_PCLK_EN() 	( RCC->AHB1ENR |= (1 << 0) )
@@ -215,3 +251,14 @@ typedef struct {
 
 // Clock disable macros for SYSCFG peripheral
 #define SYSCFG_PCLK_DI()	( RCC->APB2ENR &= ~(1 << 14) )
+
+// IRQ numbers for STM32F746
+
+#define IRQ_NO_EXTI0		6
+#define IRQ_NO_EXTI1		7
+#define IRQ_NO_EXTI2		8
+#define IRQ_NO_EXTI3		9
+#define IRQ_NO_EXTI4		10
+#define IRQ_NO_EXTI9_5		23
+#define IRQ_NO_EXTI15_10	40
+

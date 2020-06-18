@@ -3,7 +3,6 @@
 
 #include "stm32f746xx.h"
 
-
 enum class Port {
 	A, B, C, D, E, F, G, H, I, J, K
 };
@@ -13,35 +12,19 @@ enum class PinPullUpMode {
 };
 
 enum class PinOutputType {
-	PushPull,
-	OpenDrain
+	PushPull, OpenDrain
 };
 
 enum class PinNumber {
-	Pin0,
-	Pin1,
-	Pin2,
-	Pin3,
-	Pin4,
-	Pin5,
-	Pin6,
-	Pin7,
-	Pin8,
-	Pin9,
-	Pin10,
-	Pin11,
-	Pin12,
-	Pin13,
-	Pin14,
-	Pin15,
-	Pin16
+	Pin0, Pin1, Pin2, Pin3, Pin4, Pin5, Pin6, Pin7, Pin8, Pin9, Pin10, Pin11, Pin12, Pin13, Pin14, Pin15, Pin16
 };
-
 
 GPIO_RegDef_t* fromPort(Port port);
 uint8_t toPinPullUp(PinPullUpMode mode);
 uint8_t toPinNumber(PinNumber pin);
 uint8_t toOutputType(PinOutputType outputType);
+// returns the cardinality of the port. GPIOA = 0, GPIOB = 1, GPIOC = 2, ...
+uint8_t portToIndex(GPIO_RegDef_t *port);
 
 enum EnabledOrDisabledEnum {
 	Disabled = 0, Enabled = 1
@@ -66,22 +49,7 @@ enum PortNumberEnum {
 };
 
 enum PinNumberEnum {
-	Pin0 = 0,
-	Pin1,
-	Pin2,
-	Pin3,
-	Pin4,
-	Pin5,
-	Pin6,
-	Pin7,
-	Pin8,
-	Pin9,
-	Pin10,
-	Pin11,
-	Pin12,
-	Pin13,
-	Pin14,
-	Pin15
+	Pin0 = 0, Pin1, Pin2, Pin3, Pin4, Pin5, Pin6, Pin7, Pin8, Pin9, Pin10, Pin11, Pin12, Pin13, Pin14, Pin15
 };
 
 enum PinModeEnum {
@@ -124,7 +92,6 @@ typedef struct {
 
 } GPIO_Handle_t;
 
-
 #define GPIOA_REG_RESET() do { RCC->AHB1RSTR |= (1 << 0); RCC->AHB1RSTR &= ~(1 << 0); } while(0)
 #define GPIOB_REG_RESET() do { RCC->AHB1RSTR |= (1 << 1); RCC->AHB1RSTR &= ~(1 << 1); } while(0)
 #define GPIOC_REG_RESET() do { RCC->AHB1RSTR |= (1 << 2); RCC->AHB1RSTR &= ~(1 << 2); } while(0)
@@ -159,16 +126,16 @@ void GPIO_Deinit(GPIO_RegDef_t *pGPIOx);
 uint8_t GPIO_ReadFromInputPin(GPIO_RegDef_t *pGPIOx, uint8_t pinNumber);
 uint16_t GPIO_ReadFromInputPort(GPIO_RegDef_t *pGPIOx);
 
-void GPIO_WriteToOutputPin(GPIO_RegDef_t *pGPIOx, uint8_t pinNumber,
-		uint8_t pinValue);
+void GPIO_WriteToOutputPin(GPIO_RegDef_t *pGPIOx, uint8_t pinNumber, uint8_t pinValue);
 void GPIO_WriteToOutputPort(GPIO_RegDef_t *pGPIOx, uint16_t portValue);
 
-void GPIO_ToggleOutputPin(GPIO_RegDef_t* pGPIOx, uint8_t pinNumber);
+void GPIO_ToggleOutputPin(GPIO_RegDef_t *pGPIOx, uint8_t pinNumber);
 
 /**
  * IRQ configuration and ISR handling
  */
-void GPIO_IRQConfig(void);
-void GPIO_IRQHandling(void);
+void GPIO_IRQInterruptConfig(uint8_t irqNumber, uint8_t enabled);
+void GPIO_IRQPriorityConfig(uint8_t irqNumber, uint8_t irqPriority);
+void GPIO_IRQHandling(uint8_t pinNumber);
 
 #endif
