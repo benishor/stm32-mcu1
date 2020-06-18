@@ -12,6 +12,5 @@ DigitalIn::DigitalIn(Port port, PinNumber pin, PinPullUpMode pullUpMode) {
 }
 
 bool DigitalIn::read() {
-	return GPIO_ReadFromInputPin(handle.pGPIOx, handle.pinConfig.pinNumber)
-			== Enabled;
+	return GPIO_ReadFromInputPin(handle.pGPIOx, handle.pinConfig.pinNumber) == Enabled;
 }

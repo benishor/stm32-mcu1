@@ -5,7 +5,7 @@
 
 class DigitalOut {
 public:
-	DigitalOut(Port port, PinNumber pinNumber, PinOutputType outputType=PinOutputType::PushPull);
+	DigitalOut(Port port, PinNumber pinNumber, PinOutputType outputType = PinOutputType::PushPull);
 
 	void write(bool enabled);
 	void toggle();

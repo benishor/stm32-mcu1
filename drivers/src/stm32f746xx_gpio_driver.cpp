@@ -63,37 +63,31 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle) {
 	if (pGPIOHandle->pinConfig.pinMode <= Analog) {
 		// 1. configure the mode of GPIO pin
 		pGPIOHandle->pGPIOx->MODER &= pinTwoBitMask;
-		pGPIOHandle->pGPIOx->MODER |= pGPIOHandle->pinConfig.pinMode
-				<< pinTwoBitShift;
+		pGPIOHandle->pGPIOx->MODER |= pGPIOHandle->pinConfig.pinMode << pinTwoBitShift;
 	} else {
 		// TODO: implement IT modes
 	}
 
 	// 2. configure the output speed
 	pGPIOHandle->pGPIOx->OSPEEDR &= pinTwoBitMask;
-	pGPIOHandle->pGPIOx->OSPEEDR |= pGPIOHandle->pinConfig.pinSpeed
-			<< pinTwoBitShift;
+	pGPIOHandle->pGPIOx->OSPEEDR |= pGPIOHandle->pinConfig.pinSpeed << pinTwoBitShift;
 
 	// 3. configure the PUPD settings
 	pGPIOHandle->pGPIOx->PUPDR &= pinTwoBitMask;
-	pGPIOHandle->pGPIOx->PUPDR |= pGPIOHandle->pinConfig.pinPuPdControl
-			<< pinTwoBitShift;
+	pGPIOHandle->pGPIOx->PUPDR |= pGPIOHandle->pinConfig.pinPuPdControl << pinTwoBitShift;
 
 	// 4. configure the OTYPE
 	pGPIOHandle->pGPIOx->OTYPER &= pinOneBitMask;
-	pGPIOHandle->pGPIOx->OTYPER |= pGPIOHandle->pinConfig.pinOType
-			<< pinOneBitShift;
+	pGPIOHandle->pGPIOx->OTYPER |= pGPIOHandle->pinConfig.pinOType << pinOneBitShift;
 
 	// 5. configure the alternate functionality
 	if (pGPIOHandle->pinConfig.pinMode == AlternateFunction) {
 		uint8_t index = pGPIOHandle->pinConfig.pinNumber >> 3U;
-		uint32_t pinFourBitMask = ~(2
-				<< (4 * (pGPIOHandle->pinConfig.pinNumber & 7)));
+		uint32_t pinFourBitMask = ~(2 << (4 * (pGPIOHandle->pinConfig.pinNumber & 7)));
 		uint32_t pinFourBitShift = (4 * (pGPIOHandle->pinConfig.pinNumber & 7));
 
 		pGPIOHandle->pGPIOx->AFR[index] &= pinFourBitMask;
-		pGPIOHandle->pGPIOx->AFR[index] |= pGPIOHandle->pinConfig.pinAltFunMode
-				<< pinFourBitShift;
+		pGPIOHandle->pGPIOx->AFR[index] |= pGPIOHandle->pinConfig.pinAltFunMode << pinFourBitShift;
 	}
 }
 
@@ -133,8 +127,7 @@ uint16_t GPIO_ReadFromInputPort(GPIO_RegDef_t *pGPIOx) {
 	return value;
 }
 
-void GPIO_WriteToOutputPin(GPIO_RegDef_t *pGPIOx, uint8_t pinNumber,
-		uint8_t pinValue) {
+void GPIO_WriteToOutputPin(GPIO_RegDef_t *pGPIOx, uint8_t pinNumber, uint8_t pinValue) {
 	if (pinValue == Set) {
 		pGPIOx->ODR |= 1 << pinNumber;
 	} else {
